@@ -4,8 +4,14 @@
 File sync for Stallions
 
 ## To do
-* secure file transfer
-* file transfer in blocks
-* auto sync
-* command line client interface
-* server configuration tool
+### General
+- [ ] secure file transfer
+- [ ] auto sync
+- [ ] file transfer in blocks
+
+### Client
+- [x] read config file
+- [ ] command line client interface
+
+### Server
+- [ ] server configuration tool
