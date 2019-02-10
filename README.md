@@ -6,6 +6,7 @@ File sync for Stallions
 ## To do
 ### General
 - [ ] secure file transfer
+- [x] recognize file changes in directory
 - [ ] auto sync
 - [ ] file transfer in blocks
 

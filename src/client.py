@@ -2,7 +2,7 @@
 import os
 import getpass
 import configparser
-from src.watcher import Watcher
+from watcher import Watcher
 
 
 class Client:
@@ -62,7 +62,7 @@ def main():
     read_config()
     testclient = Client("192.168.0.1", 1234, getpass.getuser(), None)
     # testclient.get_public_key()
-    testclient.dirname = "C:/work"
+    testclient.dirname = input("Enter directory to monitor: ")
     w = Watcher(testclient.dirname)
     w.run()
 
