@@ -14,35 +14,55 @@ filename  = "naviato.png"
 host      = '127.0.0.1'
 port      = 5037
 
-def bitstring_to_bytes(s):
-    return int(s, 2).to_bytes((len(s) + 7) // 8, byteorder='big')
+def send_all(s, filename):
+    with open(filename, 'rb') as f:
+        data = f.read();
+        s.sendall(data)
 
-# set up connection
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((host, port))
+def send_chunk(s, filename, filesize):
+    with open(filename, 'rb') as f:
+        while filesize > CHUNK_SIZE:
+            data = f.read(CHUNK_SIZE)
+            s.send(data)
+            filesize -= CHUNK_SIZE
 
-# send filename size as 2 bytes
-size = bin(len(filename))[2:].zfill(16)
-s.send(bitstring_to_bytes(size))
+        # send last bytes
+        data = f.read(filesize)
+        s.send(data)
 
-# send filename
-s.send(filename.encode('utf-8'))
+try:
+    # set up connection
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((host, port))
 
-filename = os.path.join(directory, filename)
-filesize = os.path.getsize(filename)
-print("Filesize:", filesize)
+    # send filename size as 2 bytes
+    size = len(filename).to_bytes(2, byteorder='big')
+    s.send(size)
 
-# send filesize as 4 bytes
-size = bin(filesize)[2:].zfill(32)
-s.send(bitstring_to_bytes(size))
+    # send filename
+    s.send(filename.encode('utf-8'))
 
-'''
-with open(filename, 'rb') as f:
-    while filesize > 0:
-        data_chunk = f.read(CHUNK_SIZE)
-        s.send(data_chunk)
-'''
+    filename = os.path.join(directory, filename)
+    filesize = os.path.getsize(filename)
+    print("Filesize:", filesize)
 
-s.shutdown(socket.SHUT_WR)
+    # send filesize as 4 bytes
+    size = filesize.to_bytes(4, byteorder='big')
+    s.send(size)
 
-s.close()
+    # start sending file
+    if filesize < CHUNK_SIZE:
+        send_all(s, filename)
+    else:
+        send_chunk(s, filename, filesize)
+
+    print("Successfully send: " + filename)
+
+except Exception as e:
+    print("cannot connect to server:", e)
+
+# cleanup, close socket
+finally:
+    s.shutdown(socket.SHUT_WR)
+    s.close()
+    print("Connection closed")
