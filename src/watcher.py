@@ -1,6 +1,7 @@
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from client import Client
 
 
 class Watcher:
@@ -35,6 +36,7 @@ class Handler(FileSystemEventHandler):
             print("Received deleted event - %s." % event.src_path)
 
         elif event.event_type == 'modified':
+            Client.print_change(bitch)
             print("Received modified event - %s." % event.src_path)
 
         elif event.event_type == 'moved':

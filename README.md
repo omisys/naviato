@@ -8,7 +8,14 @@ File sync for Stallions
 ### General
 - [ ] secure file transfer
 - [ ] auto sync
-- [ ] file transfer in blocks
+- [x] file transfer in blocks
+
+### Server
+- [ ] server configuration tool
+- [x] accept incoming connections
+- [ ] parse metadata file
+- [ ] download missing files from client
+- [ ] upload missing files to client
 
 ### Client
 - [x] read config file
@@ -19,13 +26,6 @@ File sync for Stallions
 - [x] recognize file changes in directory
 - [ ] upload metadata on every change to file using client connection
 - [ ] make recent changes available to user
-
-### Server
-- [ ] server configuration tool
-- [ ] accept incoming connections
-- [ ] parse metadata file
-- [ ] download missing files from client
-- [ ] upload missing files to client
 
 ### Metadata
 - [ ] generate unique file ID

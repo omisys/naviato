@@ -6,16 +6,23 @@ from watcher import Watcher
 
 
 class Client:
+    CHUNK_SIZE = 1024
 
-    def __init__(self, ip_address, port, uname, dirname):
-        self.ip_address = ip_address
-        self.port = port
-        self.uname = uname
-        self.dirname = dirname
+    def __init__(self, conf_path):
+        # get the absolute path to the current directory
+        self.abs_file_path = os.path.abspath(os.path.dirname(__file__))
+        self.config_path = os.path.join(self.abs_file_path, conf_path)
+        self.read_config()
 
-    @staticmethod
-    def read_config():
-        print(os.getegid())
+    def read_config(self):
+        # read config file
+        config = configparser.RawConfigParser()
+        config.read(self.config_path)
+        self.host = config.get('example-config', 'host')
+        self.port = config.get('example-config', 'port')
+
+    def get_home_dir():
+        return os.path.join("/home", getpass.getuser())
 
     @staticmethod
     def get_public_key():
@@ -38,29 +45,10 @@ class Client:
         return pubkey
 
 
-def get_home_dir():
-    return os.path.join("/home", getpass.getuser())
-
-
-def read_config():
-    # get the absolute path to the config file (can run client.py from anywhere)
-    abs_file_path = os.path.abspath(os.path.dirname(__file__))
-    config_path = os.path.join(abs_file_path, "../config")
-
-    # read config file
-    config = configparser.RawConfigParser()
-    config.read(config_path)
-
-    # print some parameters
-    seperator = ":"
-    address = (config.get('example-config', 'ip'), config.get('example-config', 'port'))
-    print(seperator.join(address))
-
-
 def main():
     print(getpass.getuser())
-    read_config()
-    testclient = Client("192.168.0.1", 1234, getpass.getuser(), None)
+    print(os.getegid())
+    testclient = Client("../config")
     # testclient.get_public_key()
     testclient.dirname = input("Enter directory to monitor: ")
     w = Watcher(testclient.dirname)
