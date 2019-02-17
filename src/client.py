@@ -50,6 +50,12 @@ class Client:
         # Put all process functions for files and dirs here
         self.process_files_created()
         self.process_files_modified()
+        self.process_files_moved()
+        self.process_files_deleted()
+        self.process_dirs_created()
+        self.process_dirs_modified()
+        self.process_dirs_moved()
+        self.process_dirs_deleted()
 
     def process_files_created(self):
         for f in self._diffSnap.files_created:
@@ -74,6 +80,44 @@ class Client:
             filename = f.split("/")[-1]
             print("File modified: {}".format(filename))
 
+    def process_files_moved(self):
+        for f in self._diffSnap.files_moved:
+            filepath = f
+            filename = f.split("/")[-1]
+            print("File moved: {}".format(filename))
+
+    def process_files_deleted(self):
+        for f in self._diffSnap.files_deleted:
+            filepath = f
+            filename = f.split("/")[-1]
+            print("File deleted: {}".format(filename))
+
+    def process_dirs_created(self):
+        for d in self._diffSnap.dirs_created:
+            dirpath = d
+            print (dirpath)
+            dirname = d.split("/")[-1]
+            print("New dir created: {}".format(dirname))
+
+    def process_dirs_modified(self):
+        for d in self._diffSnap.dirs_modified:
+            dirpath = d
+            dirname = d.split("/")[-1]
+            print("Dir modified: {}".format(dirname))
+
+    def process_dirs_moved(self):
+        for (old_path, new_path) in self._diffSnap.dirs_moved:
+            oldpath = old_path
+            oldname = old_path.split("/")[-1]
+            newpath = new_path
+            newname = new_path.split("/")[-1]
+            print("Dir moved: {} to {}".format(old_path, new_path))
+
+    def process_dirs_deleted(self):
+        for d in self._diffSnap.dirs_deleted:
+            dirpath = d
+            dirname = d.split("/")[-1]
+            print("Dir deleted: {}".format(dirname))
 
 def main():
     # Make new client and read config
@@ -81,7 +125,7 @@ def main():
     c.read_config()
 
     # Set the directory to watch
-    c.watch(recursive=False)
+    c.watch()
 
     # main loop
     while True:
