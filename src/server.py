@@ -5,7 +5,7 @@ import socket
 from filetransfer import Filetransfer
 
 
-class Server(Filetransfer):
+class Server:
     def __init__(self, port, host=''):
         self._host = host
         self._port = port

@@ -7,7 +7,7 @@ File sync for Stallions
 
 ### General
 - [ ] secure file transfer
-- [ ] auto sync
+- [x] auto sync
 - [x] file transfer in blocks
 
 ### Server
@@ -20,7 +20,7 @@ File sync for Stallions
 ### Client
 - [x] read config file
 - [ ] command line client interface
-- [ ] upload files to server
+- [x] upload files to server
 
 ### File watcher
 - [x] recognize file changes in directory

@@ -10,7 +10,7 @@ from watchdog.utils.dirsnapshot import DirectorySnapshot, DirectorySnapshotDiff
 
 WATCH_TIME = 5
 
-class Client(Filetransfer):
+class Client:
 
     def __init__(self, conf_path):
         # get the absolute path to the current directory
