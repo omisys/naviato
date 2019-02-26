@@ -17,9 +17,8 @@ class Watcher:
                 print ("Invalid path")
                 watchdir = None
 
-        os.makedirs(os.path.dirname(metapath), exist_ok=True)
-
         if not os.path.isfile(metapath):
+            os.makedirs(os.path.dirname(metapath), exist_ok=True)
             Path(metapath).touch(exist_ok = True)
     
         self.metafile  = metapath
