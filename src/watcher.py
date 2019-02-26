@@ -4,6 +4,7 @@
 import time
 import os.path
 import json
+from pathlib import Path
 from filetransfer import Filetransfer
 from watchdog.utils.dirsnapshot import DirectorySnapshot, DirectorySnapshotDiff
 
@@ -14,7 +15,7 @@ class Watcher:
             watchdir = input("Enter directory to monitor: ")
 
         if not os.path.isfile(metapath):
-            metapath.touch(exist_ok = True)
+            Path(metapath).touch(exist_ok = True)
     
         self.metafile = metapath
         self.watchdir  = watchdir
@@ -51,6 +52,8 @@ class Watcher:
             filepath = f
             filename = f.split("/")[-1]
             print("New file created: {}".format(filename))
+            
+            #Try to open metafile
             with open(self.metafile) as outputfile:
                 try:
                     meta = json.load(outputfile)
@@ -58,8 +61,14 @@ class Watcher:
                     meta = {}
                 
             if not filename in meta:
+                #Push filename in dictionary 
                 meta[filename] = {}
+                #Creation time
                 meta[filename]['timecreated'] = int(time.time())
+                #Absolute file path
+                meta[filename]['abs_path'] = filepath.replace(self.watchdir, "")
+
+                #Dump into json
                 with open(self.metafile, "w") as outputfile:
                     json.dump (meta, outputfile)
 
@@ -79,15 +88,18 @@ class Watcher:
             filepath = f
             filename = f.split("/")[-1]
             print("File modified: {}".format(filename))
+
             with open(self.metafile) as outputfile:
                 try:
                     meta = json.load(outputfile)
                 except ValueError:
                     meta = {}
                 
+            #Check if the modified file is in the metafile
             if not filename in meta:
                 meta[filename] = {}
 
+            #Add modified timestamp
             meta[filename]['timemodified'] = int(time.time())
 
             with open(self.metafile, "w") as outputfile:
@@ -102,10 +114,18 @@ class Watcher:
             print("File moved: {} to {}".format(f_old, f_new))
 
             with open(self.metafile) as outputfile:
-                meta = json.load(outputfile)
+                try:
+                    meta = json.load(outputfile)
+                except ValueError:
+                    meta = {}
 
+            #Check if previous name is known in metafile
             if oldname in meta:
+                #Replace the elder with the new
                 meta[newname] = meta.pop(oldname)
+
+            #Update modified timestamp
+            meta[newname]['timemodified'] = int(time.time())
 
             with open(self.metafile, "w") as outputfile:
                 json.dump(meta, outputfile)
@@ -115,10 +135,15 @@ class Watcher:
             filepath = f
             filename = f.split("/")[-1]
             print("File deleted: {}".format(filename))
-            with open(self.metafile) as outputfile:
-                meta = json.load(outputfile)
 
+            with open(self.metafile) as outputfile:
+                try:
+                    meta = json.load(outputfile)
+                except ValueError:
+                    meta = {}
+            #Check if file is in metafile
             if filename in meta:
+                #Pop from metafile
                 meta.pop(filename)
             
             with open(self.metafile, "w") as outputfile:
