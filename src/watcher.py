@@ -11,8 +11,11 @@ from watchdog.utils.dirsnapshot import DirectorySnapshot, DirectorySnapshotDiff
 class Watcher:
 
     def __init__(self, metapath=None, watchdir=None, recursive=True):
-        if not watchdir:
+        while not watchdir:
             watchdir = input("Enter directory to monitor: ")
+            if not os.path.exists(watchdir):
+                print ("Invalid path")
+                watchdir = None
 
         if not os.path.isfile(metapath):
             Path(metapath).touch(exist_ok = True)
@@ -28,7 +31,6 @@ class Watcher:
             self._started = True
             self._newSnap = DirectorySnapshot(path=self.watchdir, recursive=self.recursive)
             self._oldSnap = self._newSnap
-            #print(self._newSnap)
         else:
             self._newSnap  = DirectorySnapshot(path=self.watchdir, recursive=self.recursive)
             self._diffSnap = DirectorySnapshotDiff(self._oldSnap, self._newSnap)
