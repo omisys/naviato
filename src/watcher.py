@@ -13,7 +13,7 @@ class Watcher:
     def __init__(self, metapath=None, watchdir=None, recursive=True):
         while not watchdir:
             watchdir = input("Enter directory to monitor: ")
-            if not os.path.exists(watchdir):
+            if not os.path.isdir(watchdir):
                 print ("Invalid path")
                 watchdir = None
 
