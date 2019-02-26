@@ -22,7 +22,7 @@ class Client(Watcher):
         self._host = config.get('example-config', 'host')
         self._port = int(config.get('example-config', 'port'))
 
-    def get_home_dir():
+    def get_home_dir(self):
         return os.path.join("/home", getpass.getuser())
 
     def watch(self, metapath=None, watchdir=None, recursive=True):
@@ -33,7 +33,7 @@ def main():
     # Make new client and read config
     c = Client("../config")
     c.read_config()
-    metapath = os.path.join(c.abs_file_path, "../meta.json")
+    metapath = os.path.join(c.get_home_dir(), ".naviato/meta.json")
     print(metapath)
     # Set the directory to watch
     c.watch(metapath)

@@ -13,14 +13,16 @@ class Watcher:
     def __init__(self, metapath=None, watchdir=None, recursive=True):
         while not watchdir:
             watchdir = input("Enter directory to monitor: ")
-            if not os.path.isdir(watchdir):
+            if not os.path.exists(watchdir):
                 print ("Invalid path")
                 watchdir = None
+
+        os.makedirs(os.path.dirname(metapath), exist_ok=True)
 
         if not os.path.isfile(metapath):
             Path(metapath).touch(exist_ok = True)
     
-        self.metafile = metapath
+        self.metafile  = metapath
         self.watchdir  = watchdir
         self.recursive = recursive
         self._started  = False
