@@ -25,17 +25,18 @@ class Client(Watcher):
     def get_home_dir():
         return os.path.join("/home", getpass.getuser())
 
-    def watch(self, watchdir=None, recursive=True):
-        Watcher.__init__(self, watchdir, recursive)
+    def watch(self, metapath=None, watchdir=None, recursive=True):
+        Watcher.__init__(self, metapath, watchdir, recursive)
 
 
 def main():
     # Make new client and read config
     c = Client("../config")
     c.read_config()
-
+    metapath = os.path.join(c.abs_file_path, "../meta.json")
+    print(metapath)
     # Set the directory to watch
-    c.watch()
+    c.watch(metapath)
 
     # main loop
     while True:

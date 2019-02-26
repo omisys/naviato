@@ -2,18 +2,25 @@
 
 ### watcher.py ###
 import time
+import os.path
+import json
 from filetransfer import Filetransfer
 from watchdog.utils.dirsnapshot import DirectorySnapshot, DirectorySnapshotDiff
 
 class Watcher:
 
-    def __init__(self, watchdir=None, recursive=True):
+    def __init__(self, metapath=None, watchdir=None, recursive=True):
         if not watchdir:
             watchdir = input("Enter directory to monitor: ")
 
+        if not os.path.isfile(metapath):
+            metapath.touch(exist_ok = True)
+    
+        self.metafile = metapath
         self.watchdir  = watchdir
         self.recursive = recursive
         self._started  = False
+        
 
     def scan(self):
         if not self._started:
@@ -44,6 +51,17 @@ class Watcher:
             filepath = f
             filename = f.split("/")[-1]
             print("New file created: {}".format(filename))
+            with open(self.metafile) as outputfile:
+                try:
+                    meta = json.load(outputfile)
+                except ValueError:
+                    meta = {}
+                
+            if not filename in meta:
+                meta[filename] = {}
+                meta[filename]['timecreated'] = int(time.time())
+                with open(self.metafile, "w") as outputfile:
+                    json.dump (meta, outputfile)
 
             try:
                 send = Filetransfer()
@@ -61,18 +79,50 @@ class Watcher:
             filepath = f
             filename = f.split("/")[-1]
             print("File modified: {}".format(filename))
+            with open(self.metafile) as outputfile:
+                try:
+                    meta = json.load(outputfile)
+                except ValueError:
+                    meta = {}
+                
+            if not filename in meta:
+                meta[filename] = {}
+
+            meta[filename]['timemodified'] = int(time.time())
+
+            with open(self.metafile, "w") as outputfile:
+                json.dump (meta, outputfile)
 
     def process_files_moved(self):
-        for f in self._diffSnap.files_moved:
-            filepath = f
-            filename = f.split("/")[-1]
-            print("File moved: {}".format(filename))
+        for f_old, f_new in self._diffSnap.files_moved:
+            oldfile = f_old
+            oldname = f_old.split("/")[-1]
+            newfile = f_new
+            newname = f_new.split("/")[-1]
+            print("File moved: {} to {}".format(f_old, f_new))
+
+            with open(self.metafile) as outputfile:
+                meta = json.load(outputfile)
+
+            if oldname in meta:
+                meta[newname] = meta.pop(oldname)
+
+            with open(self.metafile, "w") as outputfile:
+                json.dump(meta, outputfile)
 
     def process_files_deleted(self):
         for f in self._diffSnap.files_deleted:
             filepath = f
             filename = f.split("/")[-1]
             print("File deleted: {}".format(filename))
+            with open(self.metafile) as outputfile:
+                meta = json.load(outputfile)
+
+            if filename in meta:
+                meta.pop(filename)
+            
+            with open(self.metafile, "w") as outputfile:
+                json.dump(meta, outputfile)
 
     def process_dirs_created(self):
         for d in self._diffSnap.dirs_created:

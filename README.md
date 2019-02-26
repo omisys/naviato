@@ -29,8 +29,8 @@ File sync for Stallions
 
 ### Metadata
 - [ ] generate unique file ID
-- [ ] create metadata file on first detection of file
-- [ ] update metadata on change
+- [x] create metadata file on first detection of file
+- [x] update metadata on change
 - [ ] determine content of meta data file
 eg:
 ```
