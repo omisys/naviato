@@ -121,11 +121,15 @@ class Watcher:
                     meta = json.load(outputfile)
                 except ValueError:
                     meta = {}
-
-            #Check if previous name is known in metafile
-            if oldname in meta:
+            
+             #Check if previous name is known in metafile
+            if not oldname in meta:
+                meta[newname] = {}
+            else:
                 #Replace the elder with the new
+                print ('Old file popped')
                 meta[newname] = meta.pop(oldname)
+            
 
             #Update modified timestamp
             meta[newname]['timemodified'] = int(time.time())
