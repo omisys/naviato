@@ -22,6 +22,7 @@ class Watcher:
             Path(metapath).touch(exist_ok = True)
     
         self.metafile  = metapath
+        self.metafilename = metapath.split("/")[-1]
         self.watchdir  = watchdir
         self.recursive = recursive
         self._started  = False
@@ -39,6 +40,7 @@ class Watcher:
             self.process_diff()
         return
 
+
     def process_diff(self):
         # Put all process functions for files and dirs here
         self.process_files_created()
@@ -49,6 +51,18 @@ class Watcher:
         self.process_dirs_modified()
         self.process_dirs_moved()
         self.process_dirs_deleted()
+        
+        try:
+            send = Filetransfer()
+
+            send.send_init(self._host, self._port)
+            send.send_filename(self.metafilename)
+            send.send_filesize(self.metafile)
+            send.send_chunk()
+            send.close_socket()
+        except:
+            print("Failed to transfer: {}".format(filename))
+
 
     def process_files_created(self):
         for f in self._diffSnap.files_created:
@@ -86,6 +100,7 @@ class Watcher:
             except:
                 print("Failed to transfer: {}".format(filename))
 
+
     def process_files_modified(self):
         for f in self._diffSnap.files_modified:
             filepath = f
@@ -107,6 +122,7 @@ class Watcher:
 
             with open(self.metafile, "w") as outputfile:
                 json.dump (meta, outputfile)
+
 
     def process_files_moved(self):
         for f_old, f_new in self._diffSnap.files_moved:
@@ -137,6 +153,7 @@ class Watcher:
             with open(self.metafile, "w") as outputfile:
                 json.dump(meta, outputfile)
 
+
     def process_files_deleted(self):
         for f in self._diffSnap.files_deleted:
             filepath = f
@@ -156,6 +173,7 @@ class Watcher:
             with open(self.metafile, "w") as outputfile:
                 json.dump(meta, outputfile)
 
+
     def process_dirs_created(self):
         for d in self._diffSnap.dirs_created:
             dirpath = d
@@ -163,11 +181,13 @@ class Watcher:
             dirname = d.split("/")[-1]
             print("New dir created: {}".format(dirname))
 
+
     def process_dirs_modified(self):
         for d in self._diffSnap.dirs_modified:
             dirpath = d
             dirname = d.split("/")[-1]
             print("Dir modified: {}".format(dirname))
+
 
     def process_dirs_moved(self):
         for (old_path, new_path) in self._diffSnap.dirs_moved:
@@ -177,8 +197,11 @@ class Watcher:
             newname = new_path.split("/")[-1]
             print("Dir moved: {} to {}".format(old_path, new_path))
 
+
     def process_dirs_deleted(self):
         for d in self._diffSnap.dirs_deleted:
             dirpath = d
             dirname = d.split("/")[-1]
             print("Dir deleted: {}".format(dirname))
+
+
