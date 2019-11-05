@@ -2,10 +2,12 @@
 
 ### client.py ###
 import os
+import sys
 import time
 import getpass
 import configparser
 from watcher import Watcher
+import signal
 
 WATCH_TIME = 5
 
@@ -28,8 +30,12 @@ class Client(Watcher):
     def watch(self, metapath=None, watchdir=None, recursive=True):
         Watcher.__init__(self, metapath, watchdir, recursive)
 
+def signal_handler(sig, frame):
+    print('Shutdown Naviatio')
+    sys.exit(0)
 
 def main():
+    signal.signal(signal.SIGINT, signal_handler)
     # Make new client and read config
     c = Client("../config")
     c.read_config()
