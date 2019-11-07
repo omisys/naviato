@@ -61,7 +61,7 @@ class Watcher:
             send.send_chunk()
             send.close_socket()
         except:
-            print("Failed to transfer: {}".format(filename))
+            print("Failed to transfer: {}".format(self.metafilename))
 
 
     def process_files_created(self):
@@ -81,7 +81,7 @@ class Watcher:
                 #Push filename in dictionary 
                 meta[filename] = {}
                 #Creation time
-                meta[filename]['timecreated'] = int(time.time())
+                meta[filename]['timecreated'] = os.path.getmtime(f)
                 #Absolute file path
                 meta[filename]['abs_path'] = filepath.replace(self.watchdir, "")
 

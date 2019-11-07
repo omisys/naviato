@@ -12,15 +12,15 @@ class Server:
     def __init__(self, port, host=''):
         self._host = host
         self._port = port
-        workdir = None
+        self.workdir = None
         
-        while not workdir:
-            workdir = input("Enter working directory: ")
-            if not os.path.exists(workdir):
+        while not self.workdir:
+            self.workdir = input("Enter working directory: ")
+            if not os.path.exists(self.workdir):
                 print ("Invalid path")
-                workdir = None
+                self.workdir = None
             
-        os.chdir(workdir)
+        os.chdir(self.workdir)
 
     def create(self, connections=5):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -51,16 +51,15 @@ class Server:
 
 
     def process_meta(self):
-        if not os.path.isfile("/home/jop/work/server/meta.json"):
+        if not os.path.isfile(self.workdir + "/meta.json"):
             print ("rip")
             return
 
-        with open("/home/jop/work/server/meta.json") as data:
+        with open(self.workdir + "/meta.json") as data:
             meta = json.load(data)
 
             for filenames in meta:
                 print (meta[filenames])
-
 
 
 def main():
@@ -69,9 +68,9 @@ def main():
 
     # main loop of server
     while True:
-#        s.process_meta()
         s.receive()
-#        time.sleep(5)
+        s.process_meta()
+        time.sleep(5)
 
     s.close()
 
